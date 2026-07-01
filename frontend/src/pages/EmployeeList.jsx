@@ -1,126 +1,178 @@
-import Navbar from "../components/Navbar";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import API from "../services/api";
+import Navbar from "../components/Navbar";
 
 function EmployeeList() {
   const [employees, setEmployees] = useState([]);
+  const [search, setSearch] = useState("");
+
   const navigate = useNavigate();
 
   const role = localStorage.getItem("role");
 
   const fetchEmployees = async () => {
     try {
-      const res = await API.get("/employees");
+      const res = await API.get(`/employees?search=${search}`);
       setEmployees(res.data);
     } catch (err) {
-      alert(err.response?.data?.message || "Error fetching employees");
+      alert(err.response?.data?.message || "Unable to fetch employees");
     }
   };
 
   useEffect(() => {
     fetchEmployees();
-  }, []);
+  }, [search]);
 
   const deleteEmployee = async (id) => {
     if (!window.confirm("Delete this employee?")) return;
 
     try {
       await API.delete(`/employees/${id}`);
-      alert("Employee Deleted");
+
+      alert("Employee Deleted Successfully");
+
       fetchEmployees();
     } catch (err) {
       alert(err.response?.data?.message || "Delete Failed");
     }
   };
 
+  // Pagination
+
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const recordsPerPage = 5;
+
+  const lastIndex = currentPage * recordsPerPage;
+
+  const firstIndex = lastIndex - recordsPerPage;
+
+  const records = employees.slice(firstIndex, lastIndex);
+
+  const totalPages = Math.ceil(employees.length / recordsPerPage);
+
   return (
     <>
-    <div className="container mt-4">
+      <Navbar />
 
-      <h2>Employee List</h2>
+      <div className="container mt-5">
 
-      {(role === "Admin" || role === "Manager") && (
-        <button
-          className="btn btn-success mb-3"
-          onClick={() => navigate("/add-employee")}
-        >
-          Add Employee
-        </button>
-      )}
+        <h2 className="mb-3">
+          Employee List
+        </h2>
 
-      <table className="table table-bordered">
+        <input
+          className="form-control mb-3"
+          placeholder="Search Employee..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
 
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Role</th>
-            <th>Action</th>
-          </tr>
-        </thead>
+        {(role === "Admin" || role === "Manager") && (
 
-        <tbody>
+          <button
+            className="btn btn-success mb-3"
+            onClick={() => navigate("/add-employee")}
+          >
+            Add Employee
+          </button>
 
-          {employees.map((emp) => (
+        )}
 
-            <tr key={emp._id}>
+        <div className="table-responsive">
 
-              <td>{emp.name}</td>
+          <table className="table table-bordered table-striped">
 
-              <td>{emp.email}</td>
+            <thead className="table-dark">
 
-              <td>{emp.role}</td>
+              <tr>
 
-              <td>
+                <th>Name</th>
 
-              {(role==="Admin" || role==="Manager") && (
+                <th>Email</th>
 
-<button
-className="btn btn-success mb-3"
-onClick={()=>navigate("/add-employee")}
->
+                <th>Role</th>
 
-Add Employee
+                <th>Actions</th>
 
-</button>
+              </tr>
 
-)}
-{(role==="Admin" || role==="Manager") && (
+            </thead>
 
-<button
-className="btn btn-warning btn-sm me-2"
-onClick={()=>navigate(`/edit/${emp._id}`)}
->
+            <tbody>
 
-Edit
+              {records.map((emp) => (
 
-</button>
+                <tr key={emp._id}>
 
-)}
-            {role==="Admin" && (
+                  <td>{emp.name}</td>
 
-<button
-className="btn btn-danger btn-sm"
-onClick={()=>deleteEmployee(emp._id)}
->
+                  <td>{emp.email}</td>
 
-Delete
+                  <td>{emp.role}</td>
 
-</button>
+                  <td>
 
-)}
-              </td>
+                    {(role === "Admin" || role === "Manager") && (
 
-            </tr>
+                      <button
+                        className="btn btn-warning btn-sm me-2"
+                        onClick={() => navigate(`/edit/${emp._id}`)}
+                      >
+                        Edit
+                      </button>
 
-          ))}
+                    )}
 
-        </tbody>
+                    {role === "Admin" && (
 
-      </table>
+                      <button
+                        className="btn btn-danger btn-sm"
+                        onClick={() => deleteEmployee(emp._id)}
+                      >
+                        Delete
+                      </button>
 
-    </div>
+                    )}
+
+                  </td>
+
+                </tr>
+
+              ))}
+
+            </tbody>
+
+          </table>
+
+        </div>
+
+        <div className="d-flex justify-content-center mt-4">
+
+          <button
+            className="btn btn-secondary me-3"
+            disabled={currentPage === 1}
+            onClick={() => setCurrentPage(currentPage - 1)}
+          >
+            Previous
+          </button>
+
+          <h5 className="mt-2">
+            Page {currentPage} of {totalPages}
+          </h5>
+
+          <button
+            className="btn btn-secondary ms-3"
+            disabled={currentPage === totalPages || totalPages === 0}
+            onClick={() => setCurrentPage(currentPage + 1)}
+          >
+            Next
+          </button>
+
+        </div>
+
+      </div>
     </>
   );
 }
