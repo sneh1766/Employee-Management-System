@@ -22,7 +22,20 @@ function Register() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+if(form.password.length<6){
 
+    alert("Password must be at least 6 characters");
+
+    return;
+
+}
+if(!form.email.includes("@")){
+
+    alert("Invalid Email");
+
+    return;
+
+}
     try {
       await API.post("/auth/register", form);
 

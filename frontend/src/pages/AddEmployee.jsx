@@ -20,7 +20,17 @@ function AddEmployee() {
       [e.target.name]: e.target.value,
     });
   };
+if(
+!form.name ||
+!form.email ||
+!form.password
+){
 
+alert("All fields are required");
+
+return;
+
+}
   const submit = async (e) => {
 
     e.preventDefault();
@@ -35,7 +45,7 @@ function AddEmployee() {
 
     } catch (err) {
 
-      alert(err.response?.data?.message || "Error");
+      alert(err.response?.data?.message || "Something went wrong");
 
     }
 

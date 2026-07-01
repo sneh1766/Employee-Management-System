@@ -1,12 +1,12 @@
 const jwt = require("jsonwebtoken");
 
-module.exports = (req, res, next) => {
+const authMiddleware = (req, res, next) => {
   try {
     const authHeader = req.headers.authorization;
 
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
       return res.status(401).json({
-        message: "Token Missing",
+        message: "Token missing",
       });
     }
 
@@ -23,3 +23,5 @@ module.exports = (req, res, next) => {
     });
   }
 };
+
+module.exports = authMiddleware;

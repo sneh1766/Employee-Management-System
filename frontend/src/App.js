@@ -9,6 +9,7 @@ import EditEmployee from "./pages/EditEmployee";
 import Profile from "./pages/Profile";
 import ProtectedRoute from "./components/ProtectedRoute";
 import NotFound from "./pages/NotFound";
+import Unauthorized from "./pages/Unauthorized";
 
 function App() {
   return (
@@ -21,7 +22,7 @@ function App() {
 <Route
   path="/dashboard"
   element={
-    <ProtectedRoute>
+   <ProtectedRoute roles={["Admin","Manager","Employee"]}>
       <Dashboard />
     </ProtectedRoute>
   }
@@ -30,7 +31,7 @@ function App() {
 <Route
   path="/employees"
   element={
-    <ProtectedRoute>
+    <ProtectedRoute roles={["Admin","Manager"]}>
       <EmployeeList />
     </ProtectedRoute>
   }
@@ -39,7 +40,7 @@ function App() {
 <Route
   path="/add-employee"
   element={
-    <ProtectedRoute>
+    <ProtectedRoute roles={["Admin","Manager"]}>
       <AddEmployee />
     </ProtectedRoute>
   }
@@ -48,7 +49,7 @@ function App() {
 <Route
   path="/edit/:id"
   element={
-    <ProtectedRoute>
+    <ProtectedRoute roles={["Admin","Manager"]}>
       <EditEmployee />
     </ProtectedRoute>
   }
@@ -57,12 +58,13 @@ function App() {
 <Route
   path="/profile"
   element={
-    <ProtectedRoute>
+    <ProtectedRoute roles={["Admin","Manager","Employee"]}>
       <Profile />
     </ProtectedRoute>
   }
 />
 <Route path="*" element={<NotFound />} />
+<Route path="/unauthorized" element={<Unauthorized />} />
       </Routes>
     </BrowserRouter>
   );

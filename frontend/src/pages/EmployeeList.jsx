@@ -74,24 +74,42 @@ function EmployeeList() {
 
               <td>
 
-                {(role === "Admin" || role === "Manager") && (
-                  <button
-                    className="btn btn-warning btn-sm me-2"
-                    onClick={() => navigate(`/edit/${emp._id}`)}
-                  >
-                    Edit
-                  </button>
-                )}
+              {(role==="Admin" || role==="Manager") && (
 
-                {role === "Admin" && (
-                  <button
-                    className="btn btn-danger btn-sm"
-                    onClick={() => deleteEmployee(emp._id)}
-                  >
-                    Delete
-                  </button>
-                )}
+<button
+className="btn btn-success mb-3"
+onClick={()=>navigate("/add-employee")}
+>
 
+Add Employee
+
+</button>
+
+)}
+{(role==="Admin" || role==="Manager") && (
+
+<button
+className="btn btn-warning btn-sm me-2"
+onClick={()=>navigate(`/edit/${emp._id}`)}
+>
+
+Edit
+
+</button>
+
+)}
+            {role==="Admin" && (
+
+<button
+className="btn btn-danger btn-sm"
+onClick={()=>deleteEmployee(emp._id)}
+>
+
+Delete
+
+</button>
+
+)}
               </td>
 
             </tr>

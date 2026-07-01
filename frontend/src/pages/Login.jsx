@@ -19,7 +19,13 @@ function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+if(!form.email || !form.password){
 
+    alert("Please fill all fields");
+
+    return;
+
+}
     try {
       const res = await API.post("/auth/login", form);
 
