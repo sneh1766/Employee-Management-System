@@ -1,19 +1,17 @@
 const User = require("../models/User");
-const bcrypt = require("bcrypt");
 
-// Get all employees
+// ================= Get All Employees =================
 exports.getEmployees = async (req, res) => {
   try {
     const employees = await User.find().select("-password");
-
     res.json(employees);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
-// Get employee by ID
-exports.getEmployeeById = async (req, res) => {
+// ================= Get Single Employee =================
+exports.getEmployee = async (req, res) => {
   try {
     const employee = await User.findById(req.params.id).select("-password");
 
@@ -31,27 +29,10 @@ exports.getEmployeeById = async (req, res) => {
   }
 };
 
-// Create employee
+// ================= Create Employee =================
 exports.createEmployee = async (req, res) => {
   try {
-    const { name, email, password, role } = req.body;
-
-    const exists = await User.findOne({ email });
-
-    if (exists) {
-      return res.status(400).json({
-        message: "Employee already exists",
-      });
-    }
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    const employee = await User.create({
-      name,
-      email,
-      password: hashedPassword,
-      role,
-    });
+    const employee = await User.create(req.body);
 
     res.status(201).json(employee);
   } catch (error) {
@@ -61,16 +42,14 @@ exports.createEmployee = async (req, res) => {
   }
 };
 
-// Update employee
+// ================= Update Employee =================
 exports.updateEmployee = async (req, res) => {
   try {
     const employee = await User.findByIdAndUpdate(
       req.params.id,
       req.body,
-      {
-        new: true,
-      }
-    ).select("-password");
+      { new: true }
+    );
 
     res.json(employee);
   } catch (error) {
@@ -80,7 +59,7 @@ exports.updateEmployee = async (req, res) => {
   }
 };
 
-// Delete employee
+// ================= Delete Employee =================
 exports.deleteEmployee = async (req, res) => {
   try {
     await User.findByIdAndDelete(req.params.id);
@@ -88,6 +67,66 @@ exports.deleteEmployee = async (req, res) => {
     res.json({
       message: "Employee Deleted Successfully",
     });
+  } catch (error) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
+};
+
+// ================= View Own Profile =================
+exports.getMyProfile = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id).select("-password");
+
+    res.json(user);
+  } catch (error) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
+};
+
+// ================= Update Own Profile =================
+exports.updateMyProfile = async (req, res) => {
+  try {
+    const { name, email } = req.body;
+
+    const user = await User.findByIdAndUpdate(
+      req.user.id,
+      {
+        name,
+        email,
+      },
+      {
+        new: true,
+      }
+    ).select("-password");
+
+    res.json(user);
+  } catch (error) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
+};
+
+// ================= Change User Role =================
+exports.changeUserRole = async (req, res) => {
+  try {
+    const { role } = req.body;
+
+    const user = await User.findByIdAndUpdate(
+      req.params.id,
+      {
+        role,
+      },
+      {
+        new: true,
+      }
+    ).select("-password");
+
+    res.json(user);
   } catch (error) {
     res.status(500).json({
       message: error.message,

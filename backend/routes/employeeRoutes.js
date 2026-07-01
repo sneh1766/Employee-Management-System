@@ -7,13 +7,19 @@ const roleMiddleware = require("../middleware/roleMiddleware");
 
 const {
   getEmployees,
-  getEmployeeById,
+  getEmployee,
   createEmployee,
   updateEmployee,
   deleteEmployee,
+  getMyProfile,
+  updateMyProfile,
+  changeUserRole,
 } = require("../controllers/employeeController");
 
-// Get all employees
+// =========================
+// Admin & Manager
+// View All Employees
+// =========================
 router.get(
   "/",
   authMiddleware,
@@ -21,22 +27,32 @@ router.get(
   getEmployees
 );
 
-// Get one employee
+// =========================
+// Admin & Manager
+// View Single Employee
+// =========================
 router.get(
   "/:id",
   authMiddleware,
-  getEmployeeById
+  roleMiddleware("Admin", "Manager"),
+  getEmployee
 );
 
-// Create employee (Admin only)
+// =========================
+// Admin & Manager
+// Add Employee
+// =========================
 router.post(
   "/",
   authMiddleware,
-  roleMiddleware("Admin"),
+  roleMiddleware("Admin", "Manager"),
   createEmployee
 );
 
-// Update employee (Admin & Manager)
+// =========================
+// Admin & Manager
+// Update Employee
+// =========================
 router.put(
   "/:id",
   authMiddleware,
@@ -44,12 +60,46 @@ router.put(
   updateEmployee
 );
 
-// Delete employee (Admin only)
+// =========================
+// Admin Only
+// Delete Employee
+// =========================
 router.delete(
   "/:id",
   authMiddleware,
   roleMiddleware("Admin"),
   deleteEmployee
+);
+
+// =========================
+// All Users
+// View Own Profile
+// =========================
+router.get(
+  "/profile/me",
+  authMiddleware,
+  getMyProfile
+);
+
+// =========================
+// All Users
+// Update Own Profile
+// =========================
+router.put(
+  "/profile/me",
+  authMiddleware,
+  updateMyProfile
+);
+
+// =========================
+// Admin Only
+// Change User Role
+// =========================
+router.put(
+  "/change-role/:id",
+  authMiddleware,
+  roleMiddleware("Admin"),
+  changeUserRole
 );
 
 module.exports = router;
